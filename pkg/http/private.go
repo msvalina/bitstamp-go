@@ -403,8 +403,8 @@ func (c *HttpClient) V2CancelOrder(orderId int64) (response V2CancelOrderRespons
 // Buy limit order
 // Sell limit order
 
-//{"status": "error", "reason": {"__all__": ["Price is more than 20% below market price."]}}
-//{"status": "error", "reason": {"__all__": ["You need 158338.86 USD to open that order. You have only 99991.52 USD available. Check your account balance for details."]}}
+// {"status": "error", "reason": {"__all__": ["Price is more than 20% below market price."]}}
+// {"status": "error", "reason": {"__all__": ["You need 158338.86 USD to open that order. You have only 99991.52 USD available. Check your account balance for details."]}}
 type V2LimitOrderResponse struct {
 	Id       string          `json:"id"`
 	Datetime string          `json:"datetime"`
@@ -415,7 +415,7 @@ type V2LimitOrderResponse struct {
 	Reason   interface{}     `json:"reason"`
 }
 
-func (c *HttpClient) v2LimitOrder(side, currencyPair string, price, amount, limitPrice decimal.Decimal, dailyOrder, iocOrder bool, clOrdId string) (response V2LimitOrderResponse, err error) {
+func (c *HttpClient) v2LimitOrder(side, currencyPair string, price, amount, limitPrice decimal.Decimal, dailyOrder, iocOrder bool, fokOrder bool, clOrdId string) (response V2LimitOrderResponse, err error) {
 	urlPath := fmt.Sprintf("/v2/%s/%s/", side, currencyPair)
 
 	if c.autoRounding {
@@ -432,6 +432,9 @@ func (c *HttpClient) v2LimitOrder(side, currencyPair string, price, amount, limi
 	}
 	if iocOrder {
 		params = append(params, [2]string{"ioc_order", "True"})
+	}
+	if fokOrder {
+		params = append(params, [2]string{"fok_order", "True"})
 	}
 	if clOrdId != "" {
 		params = append(params, [2]string{"client_order_id", clOrdId})
@@ -450,12 +453,12 @@ func (c *HttpClient) v2LimitOrder(side, currencyPair string, price, amount, limi
 	return
 }
 
-func (c *HttpClient) V2BuyLimitOrder(currencyPair string, price, amount, limitPrice decimal.Decimal, dailyOrder, iocOrder bool, clOrdId string) (response V2LimitOrderResponse, err error) {
-	return c.v2LimitOrder("buy", currencyPair, price, amount, limitPrice, dailyOrder, iocOrder, clOrdId)
+func (c *HttpClient) V2BuyLimitOrder(currencyPair string, price, amount, limitPrice decimal.Decimal, dailyOrder, iocOrder bool, fokOrder bool, clOrdId string) (response V2LimitOrderResponse, err error) {
+	return c.v2LimitOrder("buy", currencyPair, price, amount, limitPrice, dailyOrder, iocOrder, fokOrder, clOrdId)
 }
 
-func (c *HttpClient) V2SellLimitOrder(currencyPair string, price, amount, limitPrice decimal.Decimal, dailyOrder, iocOrder bool, clOrdId string) (response V2LimitOrderResponse, err error) {
-	return c.v2LimitOrder("sell", currencyPair, price, amount, limitPrice, dailyOrder, iocOrder, clOrdId)
+func (c *HttpClient) V2SellLimitOrder(currencyPair string, price, amount, limitPrice decimal.Decimal, dailyOrder, iocOrder bool, fokOrder bool, clOrdId string) (response V2LimitOrderResponse, err error) {
+	return c.v2LimitOrder("sell", currencyPair, price, amount, limitPrice, dailyOrder, iocOrder, fokOrder, clOrdId)
 }
 
 type V2MarketOrderResponse struct {
